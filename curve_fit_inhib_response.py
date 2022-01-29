@@ -8,8 +8,12 @@ fname = "sarah_test.csv"
 
 data_set = np.loadtxt(working_dir + fname, delimiter=";", skiprows=1)
 
-# experimental data
+# experimental data labels
 sub_sets = ["cyc7b", "cyc8b", "cyc17", "cyc31"]
+
+#to set same markers and colors for each loop, which is same experiment
+markers = ["o", "v", "+", "x"]
+markers_count = 0    #to initiate the cycling through the markers list above
 
 #initiate figure for later ploting
 fig = plt.figure(figsize=(5,5),dpi=300) #required to save as .eps
@@ -51,12 +55,16 @@ for sub_set in sub_sets:
     y_final = bottom + (top-bottom)/(1+((10**(np.log10(IC50)))/(10**x_final))**HillSlope)
     
     #plot the model and the experimental points
-    plt.plot(x_final, y_final, label = "fit")
-    plt.scatter(x, y1, label = sub_set)
-    plt.scatter(x, y2, label = sub_set)
+    line = plt.plot(x_final, y_final, label = "fit") #so I can get_color for next plot I need to assign variable name
+    color = line[-1].get_color() #here I use the list with the latest appended color for next plots
+    plt.scatter(x, y1, label = sub_set, color=color, marker = markers[markers_count])
+    plt.scatter(x, y2, label = sub_set, color=color, marker = markers[markers_count])
     count = count + 3
+    markers_count = markers_count + 1
 
 plt.xlabel("log (inhibitor/protein)")
 plt.ylabel("% Hsad activity")
 plt.title("cyc inhibitors - Xi50")
 plt.legend()
+
+plt.show()
