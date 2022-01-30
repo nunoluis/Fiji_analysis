@@ -1,5 +1,3 @@
-#less elegant, less loops, but easier to change plots
-
 #only necessary depending on python env (using jupyter notebook)
 %matplotlib inline
 #%matplotlib qt
