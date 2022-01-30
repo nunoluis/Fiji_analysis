@@ -36,6 +36,7 @@ for sub_set in sub_sets:
         return bottom + (top-bottom)/(1+((10**(np.log10(IC50)))/(10**x))**HillSlope)
     
     #some tips: https://towardsdatascience.com/basic-curve-fitting-of-scientific-data-with-python-9592244a2509
+    #on averaging of data before curve_fit: https://stackoverflow.com/questions/39434402/how-to-get-confidence-intervals-from-curve-fit
     # graphpad log(inhibitor) vs. response -- Variable slope Equation:
     # https://www.graphpad.com/guides/prism/latest/curve-fitting/reg_dr_inhibit_variable.htm
     
@@ -56,15 +57,22 @@ for sub_set in sub_sets:
     print("top="+str(round(top, 3))+" (+/-"+str(round(topstdev, 3))+")")
     
     #generate values to plot same interval with model
-    x_final = np.linspace(-2, 2, 30)
-    y_final = bottom + (top-bottom)/(1+((10**(np.log10(IC50)))/(10**x_final))**HillSlope)
+    x_final = np.linspace(-2.5, 2.5, 30)
+    #y_final = bottom + (top-bottom)/(1+((10**(np.log10(IC50)))/(10**x_final))**HillSlope)
     
     #plot the model and the experimental points
-    line = plt.plot(x_final, y_final, label = "fit") #so I can get_color for next plot I need to assign variable name
     color = colors[count]
     marker = markers[count]
-    plt.scatter(x, y1, label = sub_set, color=color, marker = marker)
-    plt.scatter(x, y2, label = sub_set, color=color, marker = marker)
+    
+    line = plt.plot(x_final, objective(x_final, *pars), color = color) #so I can get_color for next plot I need to assign variable name
+    plt.scatter(x, y1, label = sub_set, color=color, marker = marker, s = 20)
+    plt.scatter(x, y2, color=color, marker = marker, s = 20)
+    
+    #generate and plot confidence intervals
+    upper = objective(x_final, *(pars + stdevs))
+    lower = objective(x_final, *(pars - stdevs))
+    plt.fill_between(x_final, upper, lower, color = color, alpha = 0.15)
+    
     count = count + 1
 
 plt.xlabel("log (inhibitor/protein)")
