@@ -1,3 +1,9 @@
+#less elegant, less loops, but easier to change plots
+
+#only necessary depending on python env (using jupyter notebook)
+%matplotlib inline
+#%matplotlib qt
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -8,12 +14,12 @@ fname = "sarah_test.csv"
 
 data_set = np.loadtxt(working_dir + fname, delimiter=";", skiprows=1)
 
-# experimental data labels
+# experimental data sets/labels
 sub_sets = ["cyc7b", "cyc8b", "cyc17", "cyc31"]
 
 #to set same markers and colors for each loop, which is same experiment
 markers = ["o", "v", "+", "x"]
-markers_count = 0    #to initiate the cycling through the markers list above
+colors = ["red", "blue", "green", "orange"]
 
 #initiate figure for later ploting
 fig = plt.figure(figsize=(5,5),dpi=300) #required to save as .eps
@@ -22,9 +28,10 @@ fig = plt.figure(figsize=(5,5),dpi=300) #required to save as .eps
 #adjust value at end of loop to add to count for different replicate #
 count = 0
 for sub_set in sub_sets:
-    x = data_set[:,0+count]
-    y1 = data_set[:, 1+count]
-    y2 = data_set[:, 2+count]
+    col = count*3
+    x = data_set[:,0+col]
+    y1 = data_set[:, 1+col]
+    y2 = data_set[:, 2+col]
     y = np.average(np.vstack((y1, y2)), 0) #second position is for axis to where average, in this case the lines i.e."0"
     # function to fit for, the "objective"
     def objective(x, IC50, HillSlope, bottom, top):
@@ -38,7 +45,7 @@ for sub_set in sub_sets:
     pars, covx = curve_fit(objective, x, y)
     
     #get parameters "pars"
-    IC50, HillSlope, bottom, top = pars    #need to be in same order of when def objective, after "x"
+    IC50, HillSlope, bottom, top = pars
     
     # Get the standard deviations of the parameters (square roots of the diagonal of the covariance)
     stdevs = np.sqrt(np.diag(covx))
@@ -56,15 +63,18 @@ for sub_set in sub_sets:
     
     #plot the model and the experimental points
     line = plt.plot(x_final, y_final, label = "fit") #so I can get_color for next plot I need to assign variable name
-    color = line[-1].get_color() #here I use the list with the latest appended color for next plots
-    plt.scatter(x, y1, label = sub_set, color=color, marker = markers[markers_count])
-    plt.scatter(x, y2, label = sub_set, color=color, marker = markers[markers_count])
-    count = count + 3
-    markers_count = markers_count + 1
+    color = colors[count]
+    marker = markers[count]
+    plt.scatter(x, y1, label = sub_set, color=color, marker = marker)
+    plt.scatter(x, y2, label = sub_set, color=color, marker = marker)
+    count = count + 1
 
 plt.xlabel("log (inhibitor/protein)")
 plt.ylabel("% Hsad activity")
 plt.title("cyc inhibitors - Xi50")
 plt.legend()
 
-plt.show()
+plt.savefig(working_dir + fname + "_plot.eps", format = "eps") #if you want to save the plot to the save location of data uncomment line
+
+plt.show() # always needs to be at the end, after plt.savefig() otherwise fig is not saved correctly
+
