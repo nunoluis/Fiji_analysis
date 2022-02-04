@@ -1,13 +1,12 @@
 //To be edited here BEFORE running macro:
 
-interval_acquired=10; //change for time lapse interval during acquisition in minutes
+interval_acquired=1; //change for time lapse interval during acquisition in minutes
 interval_analysis=10; //change for interval time steps wanted for analysis, in minutes (1 point every 1min, every 10min, etc)
 duration_analysis = 60; //change for total interval to be considered for analysis, in minutes
 
 //macro starts
 frame_step=interval_analysis/interval_acquired;
 frames = duration_analysis / interval_acquired;
-
 
 filePath = getDirectory("Choose the directory where to save the Results"); //where to save Results table
 
@@ -26,7 +25,7 @@ print(frames);
 
 //below is to cycle through all ROI determined by the Ridge Detection plugin and measure
 //the distances between bright dots in the GFP channel
-for (frame=0 ; frame<frames; frame=frame+frame_step) {
+for (frame=1 ; frame<frames+2 ; frame=frame+frame_step) {
 	//wait for user input to draw the line
 	Roi.setPosition(frame);
 	roiManager("Add");
@@ -41,6 +40,18 @@ Table.save(plot_data);
 //	close(plot);
 //	close(peaksinplot);
 
+run("Clear Results");
+waitForUser("Make sure a rectangular selection for background subtraction has been made on the image stack"); //user confirms a rectangle has been drawn
+run("Set Measurements...", "area mean limit redirect=None decimal=3");
+for (frame=1 ; frame<frames+2 ; frame=frame+frame_step) {
+	setSlice(frame);;
+	run("Measure");
+	
+}	
+
+backgroud_data = filePath + "background_data.csv";
+selectWindow("Results");
+saveAs("Results", backgroud_data);
 
 //note to self:
 //https://forum.image.sc/t/saving-results-from-plot-values-into-arrays-in-imagej-macro/10438/21
