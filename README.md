@@ -18,3 +18,5 @@ It takes a .csv file and go through columns for data. In this case, the x values
 ## large_file_split.js
 - from virtual file iterates through time lapse frames and generates max_projection for selected channel
 
+##anim_hist
+template for simple animation. Trying to get 2 plots overlaied, and clearing the figure in between frames.
