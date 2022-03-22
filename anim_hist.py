@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 #install the ffmpeg package to save the animation -> conda install -c conda-forge ffmpeg
+# animations
+# https://towardsdatascience.com/intro-to-dynamic-visualization-with-python-animations-and-interactive-plots-f72a7fb69245
 
 fig = plt.figure(figsize=(5,5),dpi=300) #required to save as .eps
 plt.ylim([0,60])
